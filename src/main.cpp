@@ -8,6 +8,7 @@
 #include "configurations.h"
 #include "state.h"
 #include "Flash/Flash.h"
+#include "Communication.h"
 
 
 void refreshData();
@@ -24,6 +25,7 @@ void setup()
 #endif
 
     Flash::init();
+    Comm::init();
 }
 
 void loop()

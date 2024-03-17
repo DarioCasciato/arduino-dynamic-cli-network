@@ -6,6 +6,7 @@
 #include "hardware.h"
 #include "configurations.h"
 #include "Timer.h"
+#include "Communication.h"
 
 //------------------------------------------------------------------------------
 
@@ -35,7 +36,12 @@ namespace State
     // State implementations (can also be moved to separate files)
     void stateIdle()
     {
+        if (Comm::serialAvailable())
+        {
+            Comm::getSerialCommand();
+        }
 
+        delay(10);
     }
 
     void stateError()
