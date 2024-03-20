@@ -36,10 +36,7 @@ namespace State
     // State implementations (can also be moved to separate files)
     void stateIdle()
     {
-        if (Comm::serialAvailable())
-        {
-            Comm::getSerialCommand();
-        }
+        Comm::handleSerialCommand();
 
         delay(10);
     }

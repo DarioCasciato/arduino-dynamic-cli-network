@@ -2,7 +2,4 @@
 // Template-Project | Commands
 // =============================================================================
 
-namespace Command
-{
-
-} // namespace Command
+#include <Arduino.h>

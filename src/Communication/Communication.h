@@ -12,17 +12,12 @@ namespace Comm
     ///
     void init();
 
-    /// @brief Check if there is a serial command available
-    /// @return true if a command is available
-    ///
-    bool serialAvailable();
-
     /// @brief Get the serial command
     ///
-    void getSerialCommand();
+    void handleSerialCommand();
 
-    /// @brief Send a message
-    /// @param message The message to send
+    /// @brief Get the I2C address of the device
+    /// @return The I2C address
     ///
-    void send(const String& message);
+    uint8_t getI2CAddress();
 } // namespace Comm
