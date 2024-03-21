@@ -48,17 +48,50 @@ namespace
         int secondSpace = commandString.indexOf(' ', firstSpace + 1);
         int thirdSpace = commandString.indexOf(' ', secondSpace + 1);
         int fourthSpace = commandString.indexOf(' ', thirdSpace + 1);
+        int fifthSpace = commandString.indexOf(' ', fourthSpace + 1);
 
         // Create a SerialCommand object and fill its fields
         Comm::SerialCommand command;
-        command.addr = hexStringToByte(commandString.substring(0, firstSpace));
+        command.senderAddr = hexStringToByte(commandString.substring(0, firstSpace));
+        command.receiverAddr = hexStringToByte(commandString.substring(firstSpace + 1, secondSpace));
+        command.command = commandString.substring(secondSpace + 1, thirdSpace);
+        command.param1 = commandString.substring(thirdSpace + 1, fourthSpace);
+        command.param2 = commandString.substring(fourthSpace + 1, fifthSpace);
+        command.param3 = commandString.substring(fifthSpace + 1);
+
+        Logging::log("Sender Address: %u, Receiver Address: %u, Command: %s, Param1: %s, Param2: %s, Param3: %s",
+                    command.senderAddr, command.receiverAddr, command.command.c_str(), command.param1.c_str(), command.param2.c_str(), command.param3.c_str());
+
+        return command;
+    }
+
+
+    /// @brief  Parse a command string into a SerialCommand object
+    ///         Difference is, that the serial command string only includes receiver address
+    /// @param  commandString The command string to parse
+    /// @return The SerialCommand object
+    ///
+    Comm::SerialCommand parseSerialCommandString(String commandString)
+    {
+        Logging::log("Command: %s", commandString.c_str());
+
+        // Split the command string into parts
+        int firstSpace = commandString.indexOf(' ');
+        int secondSpace = commandString.indexOf(' ', firstSpace + 1);
+        int thirdSpace = commandString.indexOf(' ', secondSpace + 1);
+        int fourthSpace = commandString.indexOf(' ', thirdSpace + 1);
+
+        // Create a SerialCommand object and fill its fields
+        Comm::SerialCommand command { };
+        command.senderAddr = i2cAddress;
+        command.receiverAddr = hexStringToByte(commandString.substring(0, firstSpace));
         command.command = commandString.substring(firstSpace + 1, secondSpace);
         command.param1 = commandString.substring(secondSpace + 1, thirdSpace);
         command.param2 = commandString.substring(thirdSpace + 1, fourthSpace);
         command.param3 = commandString.substring(fourthSpace + 1);
 
-        Logging::log("Address: %u, Command: %s, Param1: %s, Param2: %s, Param3: %s",
-                    command.addr, command.command.c_str(), command.param1.c_str(), command.param2.c_str(), command.param3.c_str());
+        Logging::log("Sender Address: %u, Receiver Address: %u, Command: %s, Param1: %s, Param2: %s, Param3: %s",
+                    command.senderAddr, command.receiverAddr, command.command.c_str(), command.param1.c_str(), command.param2.c_str(), command.param3.c_str());
 
         return command;
     }
@@ -99,16 +132,17 @@ namespace Comm
             String commandString = Serial.readStringUntil('\n');
             Logging::log("Command: %s", commandString.c_str());
 
-            SerialCommand cmd = parseCommandString(commandString);
+            SerialCommand cmd = parseSerialCommandString(commandString);
 
 
-            if(cmd.addr == i2cAddress)
+            if(cmd.receiverAddr == i2cAddress)
             {
                 Command::handle(cmd);
             }
             else
             {
-                WComm::push(cmd.addr, commandString);
+                cmd.senderAddr = i2cAddress;
+                WComm::push(cmd.receiverAddr, commandString);
             }
         }
     }

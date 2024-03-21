@@ -14,8 +14,10 @@ namespace WComm
         Wire.endTransmission();
     }
 
-    void respond(const String &message)
+    void respond(Comm::SerialCommand cmd, const String &message)
     {
+        Wire.beginTransmission(cmd.senderAddr);
         Wire.write(message.c_str());
+        Wire.endTransmission();
     }
 }
